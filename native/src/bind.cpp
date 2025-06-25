@@ -1,8 +1,21 @@
 #include <pybind11/pybind11.h>
 #include <iostream>
+#include <Windows.h>
+#include <dwmapi.h>
 #include "LAppDelegate.hpp"
 #include "LAppLive2DManager.hpp"
 #include "LAppModel.hpp"
+
+void set_background_transparent(int handle)
+{
+    DWM_BLURBEHIND bb = { 0 };
+    HRGN hRgn = CreateRectRgn(0, 0, -1, -1);
+    bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
+    bb.hRgnBlur = hRgn;
+    bb.fEnable = TRUE;
+    DwmEnableBlurBehindWindow(HWND(handle), &bb);
+}
+
 void model_init(pybind11::object obj)
 {
     LAppDelegate::GetInstance()->Initialize(std::move(LAppWindow(obj)));
@@ -41,6 +54,7 @@ void model_cick_release(int x, int y)
 
 PYBIND11_MODULE(nagi_cpp_ex, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
+    m.def("set_background_transparent", &set_background_transparent, "set_background_transparent");
     m.def("model_init", &model_init, "model_init");
     m.def("model_resize", &model_resize, "model_resize");
     m.def("model_update", &model_update, "model_update");

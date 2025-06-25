@@ -12,6 +12,7 @@
 #include <Math/CubismMatrix44.hpp>
 #include <Math/CubismViewMatrix.hpp>
 #include "CubismFramework.hpp"
+#include "TapeDefine.h"
 #include <Rendering/OpenGL/CubismOffscreenSurface_OpenGLES2.hpp>
 
 class TouchManager;
@@ -21,6 +22,7 @@ class LAppModel;
 /**
 * @brief 描画クラス
 */
+TCLASS(comment = "App Object")
 class LAppView
 {
 public:
@@ -63,6 +65,7 @@ public:
     /**
     * @brief スプライト系のサイズ再設定
     */
+    TFUNCTION()
     void ResizeSprite();
 
     /**

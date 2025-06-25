@@ -41,6 +41,7 @@ include_directories(${pybind11_INCLUDE_DIRS})
 include_directories(${PYTHON_INCLUDE_DIRS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tape/include)
 include_directories(${GLEW_PATH}/include)
 include_directories(${GLFW_PATH}/include)
 include_directories(framework/src)
@@ -48,7 +49,7 @@ include_directories(third/stb)
 aux_source_directory(src MY_SOURCES)
 Python_add_library(nagi_cpp_ex ${MY_SOURCES})
 target_compile_definitions(nagi_cpp_ex PUBLIC CSM_TARGET_WIN_GL)
-target_link_libraries(nagi_cpp_ex PUBLIC pybind11::headers OpenGL::GL framework Live2DCubismCore glew_s winmm.lib
+target_link_libraries(nagi_cpp_ex PUBLIC pybind11::headers OpenGL::GL framework Live2DCubismCore glew_s winmm.lib dwmapi.lib
 debug -NODEFAULTLIB:libcmtd.lib
 optimized -NODEFAULTLIB:libcmt.lib)
 target_include_directories(nagi_cpp_ex PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/third/live2d/inc)

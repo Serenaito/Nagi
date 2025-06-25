@@ -68,9 +68,9 @@ namespace LAppDefine {
 #ifdef QF_DEBUG
     const csmBool DebugLogEnable = true;
 #else
-    const csmBool DebugLogEnable = false;
+    const csmBool DebugLogEnable = true;
 #endif
-    const csmBool DebugTouchLogEnable = false;
+    const csmBool DebugTouchLogEnable = true;
 
     // Frameworkから出力するログのレベル設定
     const CubismFramework::Option::LogLevel CubismLoggingLevel = CubismFramework::Option::LogLevel_Verbose;

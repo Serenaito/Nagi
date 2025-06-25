@@ -2,16 +2,18 @@ from PySide6 import QtWidgets
 from mainwindow import Ui_MainWindow
 from PySide6.QtCore import Qt
 import sys
-class Test(QtWidgets.QMainWindow, Ui_MainWindow):
+import threading
+from nagi_native import nagi_cpp
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent = None):
-        super(Test, self).__init__(parent = parent)
+        super(MainWindow, self).__init__(parent = parent)
         self.setupUi(self)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
         self.setFixedSize(self.width(), self.height())
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    w = Test()
+    w = MainWindow()
     w.show()
+    nagi_cpp.set_background_transparent(w.winId())
     sys.exit(app.exec())

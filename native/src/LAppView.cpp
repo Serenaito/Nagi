@@ -244,7 +244,7 @@ float LAppView::TransformViewX(float deviceX) const
 float LAppView::TransformViewY(float deviceY) const
 {
     float screenY = _deviceToScreen->TransformY(deviceY); // 論理座標変換した座標を取得。
-    return _viewMatrix->InvertTransformY(screenY); // 拡大、縮小、移動後の値。
+    return _viewMatrix->InvertTransformY(screenY); // 拡大、縮小、移動後の値。 
 }
 
 float LAppView::TransformScreenX(float deviceX) const
