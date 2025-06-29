@@ -3,6 +3,7 @@ from PySide6.QtCore import QTimer
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter,QColor
 from nagi_native import nagi_cpp
+import math
 class QModelWidget(QtOpenGLWidgets.QOpenGLWidget):
     def __init__(self, parent=None):
         super(QModelWidget, self).__init__(parent = parent)
@@ -22,7 +23,9 @@ class QModelWidget(QtOpenGLWidgets.QOpenGLWidget):
     
     def mouseReleaseEvent(self, event):
         print("Release x:{} y:{}".format(event.x(), event.y()))
-        nagi_cpp.model_cick_release(event.x(), event.y())
+        # nagi_cpp.model_cick_release(event.x(), event.y())
+        nagi_cpp.LAppDelegate()
+        nagi_cpp.LAppDelegate.GetInstance().mouseReleaseEvent(event.x(), event.y())
         return super().mouseReleaseEvent(event)
     
     def mousePressEvent(self, event):

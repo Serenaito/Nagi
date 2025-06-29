@@ -1,0 +1,22 @@
+${header_include(code['include_files'])}
+void ${code['export_file_name']}(pybind11::module_& m)
+{
+% for clz_info in code['clz_infos']:
+    ${add_cls(clz_info)}
+% endfor
+}
+<%namespace file="base.template" import="*"/>
+<%def name="add_cls(clz_info)">
+% if clz_info['is_singleton'] == 1:
+    auto& clz = pybind11::class_<${clz_info['name']}, std::unique_ptr<${clz_info['name']}, pybind11::nodelete>>(m, 
+    "${clz_info['name']}",
+    "${clz_info['comment']}");
+    clz.def(pybind11::init([]() { return nullptr;}));
+% else:
+    auto& clz = pybind11::class_<${clz_info['name']}>(m, "${clz_info['name']}");
+    clz.def(pybind11::init());
+% endif
+% for func in clz_info['funcs']:
+    clz.def("${func['name']}", &${clz_info['name']}::${func['name']}, "${func['comment']}");
+% endfor
+</%def>

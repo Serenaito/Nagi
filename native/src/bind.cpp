@@ -5,6 +5,11 @@
 #include "LAppDelegate.hpp"
 #include "LAppLive2DManager.hpp"
 #include "LAppModel.hpp"
+#include "TapeDefine.h"
+
+TCLASS(a=123, c="dd1")
+class BFUCKKKKKKK {
+};
 
 void set_background_transparent(int handle)
 {

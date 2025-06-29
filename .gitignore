@@ -4,3 +4,5 @@ native/build
 nagi_native
 __pycache__
 Resources
+__template_cache__
+native/generate

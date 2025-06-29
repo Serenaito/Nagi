@@ -1,0 +1,5 @@
+<%def name="header_include(include_files)">#include <pybind11/pybind11.h>
+% for include_file in include_files:
+#include <${include_file}>
+% endfor
+</%def>

@@ -7,6 +7,13 @@
 
 #include "TouchManager.hpp"
 #include <math.h>
+#include "TapeDefine.h"
+
+TCLASS(a=123, c="dd1")
+class BFUCKKKKKKK22 {
+    TFUNCTION(b= 12)
+    void print111111(){};
+};
 
 TouchManager::TouchManager()
     : _startY(0.0f)

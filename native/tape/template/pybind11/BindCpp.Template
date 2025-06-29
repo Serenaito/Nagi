@@ -1,0 +1,9 @@
+${header_include(include_files)}
+PYBIND11_MODULE(${bind_module_name}, m)
+{
+    m.doc() = "${doc_comment}";
+% for imported_func in imported_funcs:
+    ${imported_func}(m);
+% endfor
+}
+<%namespace  file="Base.Template" import="*"/>
