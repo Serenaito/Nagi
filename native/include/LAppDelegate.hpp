@@ -8,7 +8,9 @@
 #pragma once
 #include "LAppAllocator.hpp"
 #include <GL/glew.h>
+#include "TapeDefine.h"
 #include "LAppWindow.hpp"
+#include <pybind11/pybind11.h>
 
 class LAppView;
 class LAppTextureManager;
@@ -16,6 +18,8 @@ class LAppTextureManager;
 * @brief   アプリケーションクラス。
 *   Cubism SDK の管理を行う。
 */
+
+TCLASS(is_singleton = 1)
 class LAppDelegate
 {
 public:
@@ -25,6 +29,7 @@ public:
     *
     * @return  クラスのインスタンス
     */
+    TFUNCTION()
     static LAppDelegate* GetInstance();
 
     /**
@@ -46,10 +51,11 @@ public:
     /**
     * @brief   実行処理。
     */
-    void resize();
-
+    //void resize();
+    TFUNCTION()
     void resize(int width,int height);
 
+    TFUNCTION()
     void update();
 #if 0
     /**
@@ -72,8 +78,11 @@ public:
     void OnMouseCallBack(GLFWwindow* window, double x, double y);
 #endif
 
+    TFUNCTION()
     void mousePressEvent(int x, int y);
+    TFUNCTION()
     void mouseReleaseEvent(int x, int y);
+    TFUNCTION()
     void mouseMoveEvent(int x, int y);
 
     /**
@@ -103,6 +112,11 @@ public:
 
     LAppTextureManager* GetTextureManager() { return _textureManager; }
 
+    TFUNCTION()
+    static void set_background_transparent(int handle);
+    
+    TFUNCTION()
+    void model_init(pybind11::object obj);
 private:
     /**
     * @brief   コンストラクタ

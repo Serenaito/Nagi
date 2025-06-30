@@ -15,5 +15,5 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
     w.show()
-    nagi_cpp.set_background_transparent(w.winId())
+    nagi_cpp.LAppDelegate.set_background_transparent(w.winId())
     sys.exit(app.exec())

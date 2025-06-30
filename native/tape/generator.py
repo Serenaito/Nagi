@@ -8,7 +8,8 @@ from mako import template
 
 template_path = os.path.join(os.path.split(os.path.realpath(__file__))[0], "template", "pybind11")
 cache_path = os.path.join(template_path, "__template_cache__")
-
+cmake_path = '{}\n${{CMAKE_CURRENT_SOURCE_DIR}}/{}'
+cmake_file_name = "generate.cmake"
 class GeneratorType(Enum):
     PYBIND11 = 1
 
@@ -34,6 +35,7 @@ class Generator_Pybind11(Generator):
         main_include_files = []
         create_directories = set()
         codes = []
+        cmake_files = ''
         for metadata in parser.metadatas:
             path:Path = metadata['path']
             create_directories.add(path.local_root)
@@ -41,9 +43,13 @@ class Generator_Pybind11(Generator):
             code = dict()
             code['include_files'] = [path.filename]
             code['export_file_name'] = 'Bind_{}'.format(path.filename.split('.')[0])
+            file_name = '{}.h'.format(code['export_file_name'])
             code['file_path'] = os.path.join(abs_path, 
                                              path.local_root, 
-                                             '{}.h'.format(code['export_file_name']))
+                                             file_name)
+            cmake_files = cmake_path.format(cmake_files, '{}/{}/{}'.format(self._root_path,
+                                                                           path.local_root, 
+                                                                           file_name))
             main_include_files.append('{}/{}'.format(path.local_root, 
                                                      '{}.h'.format(code['export_file_name'])))
             clz_infos = []
@@ -84,7 +90,14 @@ class Generator_Pybind11(Generator):
                             bind_module_name = self._module_name,
                             doc_comment = "test",
                             imported_funcs = imported_funcs)
-            f.write(code.replace('\r',''))      
+            f.write(code.replace('\r',''))
+        cmake_files = cmake_path.format(cmake_files, '{}/Bind_Main.cpp'.format(self._root_path))
+        with open(os.path.join(abs_path, cmake_file_name), 'w') as f:
+            f.write('''
+set(GENERATE_FILES
+{}
+)                    '''.format(cmake_files))
+
 
 def GeneratorFactory(root_path, module_name, e: GeneratorType = GeneratorType.PYBIND11):        
     if e == GeneratorType.PYBIND11:

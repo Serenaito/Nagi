@@ -22,7 +22,6 @@ class LAppModel;
 /**
 * @brief 描画クラス
 */
-TCLASS(comment = "App Object")
 class LAppView
 {
 public:
