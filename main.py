@@ -3,7 +3,7 @@ from mainwindow import Ui_MainWindow
 from PySide6.QtCore import Qt
 import sys
 import threading
-from nagi_native import nagi_cpp
+from nagi_native import LAppDelegate
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent = None):
         super(MainWindow, self).__init__(parent = parent)
@@ -15,5 +15,5 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
     w.show()
-    nagi_cpp.LAppDelegate.set_background_transparent(w.winId())
+    LAppDelegate.set_background_transparent(w.winId())
     sys.exit(app.exec())

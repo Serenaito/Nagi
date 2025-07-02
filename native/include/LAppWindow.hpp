@@ -1,10 +1,14 @@
+#pragma once
 #include <pybind11/pybind11.h>
+#include <TapeDefine.h>
 
-
+TCLASS()
 class LAppWindow 
 {
 public:
-    LAppWindow(){}
+    LAppWindow() {}
+
+    LAppWindow(int,float){}
 
     LAppWindow(pybind11::object _obj)
     {

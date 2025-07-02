@@ -41,6 +41,7 @@ public:
     /**
     * @brief   APPに必要なものを初期化する。
     */
+    TFUNCTION()
     bool Initialize(LAppWindow& window);
 
     /**
@@ -115,8 +116,6 @@ public:
     TFUNCTION()
     static void set_background_transparent(int handle);
     
-    TFUNCTION()
-    void model_init(pybind11::object obj);
 private:
     /**
     * @brief   コンストラクタ

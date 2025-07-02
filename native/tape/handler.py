@@ -30,12 +30,13 @@ class CursorProxy:
         self._key = location.line << 20 | location.column
         self._cursor = cursor
         self._handler = handler
+        self.childrens = list()
     @property
     def key(self):
         return self._key
     
     @property
-    def cursor(self):
+    def cursor(self)->cindex.Cursor:
         return self._cursor
     
     @property
@@ -48,6 +49,8 @@ class CursorProxy:
     def __lt__(self, other):
         return self._key < other._key
     
+    def add_child(self, children):
+        self.childrens.append(children)
 
 class Handler:
     def __init__(self, parent:Context, key_word):
@@ -75,13 +78,14 @@ def collection_metadata(context:Context, root:cindex.Cursor):
             if handle:
                 cursor_list.append(CursorProxy(cursor, location, handle))
         elif cursor.kind == cindex.CursorKind.CLASS_DECL or cursor.kind == cindex.CursorKind.STRUCT_DECL:
-            cursor_list.append(CursorProxy(cursor, location))
+            proxy = CursorProxy(cursor, location)
+            cursor_list.append(proxy)
             for child_cursor in cursor.get_children():
                 if child_cursor.kind == cindex.CursorKind.CXX_METHOD:
                     cursor_list.append(CursorProxy(child_cursor, child_cursor.location))
-        elif cursor.kind == cindex.CursorKind.CXX_METHOD:
-            cursor_list.append(CursorProxy(cursor, location))
-            
+                elif child_cursor.kind == cindex.CursorKind.CONSTRUCTOR:
+                    if child_cursor.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                        proxy.add_child(CursorProxy(child_cursor, child_cursor.location))
     cursor_list.sort()
     # for proxy in cursor_list:
     #     print("reslut {} {} {} {}".format(proxy.cursor.kind, 
@@ -120,7 +124,14 @@ class ClassHandler(Handler):
                 for token in proxy.cursor.get_tokens():
                     token_str = token_str + token.spelling
                 token_str = token_str.replace(self._key_word, "dict")
-                self._parent.database[current_proxy.cursor.spelling] = dict(meta_info = eval("{}".format(token_str)), funcs = [])
+                clz_info = dict(meta_info = eval("{}".format(token_str)), funcs = [], constructors = [])
+                self._parent.database[current_proxy.cursor.spelling] = clz_info
+                for children in current_proxy.childrens:
+                    arg_type_list = []
+                    for arg in children.cursor.get_arguments():
+                        arg_type_list.append(arg.type.spelling)
+                    if len(arg_type_list) > 0:
+                        clz_info['constructors'].append(arg_type_list)
                 return
 
 class FunctionHandler(Handler):
@@ -132,7 +143,6 @@ class FunctionHandler(Handler):
         for current_proxy in children:
             if current_proxy.cursor.kind != cindex.CursorKind.CXX_METHOD:
                 continue
-
             semantic_parent = current_proxy.cursor.semantic_parent
             if semantic_parent is None:
                 continue
@@ -146,6 +156,8 @@ class FunctionHandler(Handler):
                 token_str = token_str + token.spelling
             
             token_str = token_str.replace(self._key_word, "dict")
-            self._parent.database[clz]['funcs'].append(dict(name = current_proxy.cursor.spelling, meta_info = eval("{}".format(token_str))))
+            is_static = current_proxy.cursor.storage_class == cindex.StorageClass.STATIC
+            self._parent.database[clz]['funcs'].append(dict(name = current_proxy.cursor.spelling, 
+                                                            meta_info = eval("{}".format(token_str)), 
+                                                                             is_static = is_static))
             return
-            

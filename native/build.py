@@ -8,12 +8,6 @@ import tape.parser, tape.generator
 import time
 
 if __name__ == '__main__':
-    parser = tape.parser.Parser()
-    generator = tape.generator.GeneratorFactory("generate", "nagi_cpp_ex")
-    parser.add_include_directories('./include')
-    parser.add_include_directories('./tape/include')
-    parser.add_bind_directory("include")
-    generator.start(parser)
     src_path = os.path.abspath('.')
     parent_path = os.path.abspath('../')
     python_bind_path = os.path.join(parent_path, "nagi_native") 
@@ -27,7 +21,20 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--rebuild', type=int, help='if set 1 clean project and build')
     parser.add_argument('--test', help='if set 1 clean project and build')
+    parser.add_argument('--tape', help='just tape')
     args = parser.parse_args()
+
+    parser = tape.parser.Parser()
+    generator = tape.generator.GeneratorFactory("generate", "nagi_cpp_ex")
+    parser.add_include_directories('./include')
+    parser.add_include_directories('./tape/include')
+    parser.add_include_directories(pybind11.get_include())
+    parser.add_bind_directory("include")
+    export_symbol = generator.start(parser)
+    export_symbol_str = ''
+    for symbol in export_symbol:
+        export_symbol_str = '{}\n{} = {}.{}'.format(export_symbol_str, symbol, module_cpp_name, symbol)
+
     build_path = os.path.join(src_path, "build")
     if os.path.exists(build_path):
         if args.rebuild == 1:
@@ -55,7 +62,7 @@ if __name__ == '__main__':
 '''import sys
 sys.path.append('{}')
 import {}
-{} = {}'''.format(python_bind_lib_path, module_cpp_name, module_py_name, module_cpp_name).encode())
+{}'''.format(python_bind_lib_path, module_cpp_name, export_symbol_str).encode())
     sys.path.append(python_bind_lib_path)
     subprocess.run("cd {} && python -m pybind11_stubgen {} -o {}".
                    format(python_bind_lib_path, module_cpp_name, python_bind_path),

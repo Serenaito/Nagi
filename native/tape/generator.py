@@ -18,7 +18,7 @@ class Generator():
         self._root_path = root_path
         self._module_name = module_name
 
-    def start(self, parser:Parser):
+    def start(self, parser:Parser) -> list[str]:
         pass
 
 class Generator_Pybind11(Generator):
@@ -36,6 +36,7 @@ class Generator_Pybind11(Generator):
         create_directories = set()
         codes = []
         cmake_files = ''
+        export_symbol = []
         for metadata in parser.metadatas:
             path:Path = metadata['path']
             create_directories.add(path.local_root)
@@ -57,10 +58,28 @@ class Generator_Pybind11(Generator):
             for clz_name, clz_info in data.items():
                 new_info = dict()
                 clz_infos.append(new_info)
+                export_symbol.append(clz_name)
                 new_info['name'] = clz_name
                 meta_info = clz_info.get('meta_info')
                 new_info['comment'] = meta_info.get('comment', '')
                 new_info['is_singleton'] = meta_info.get('is_singleton', 0)
+                constructors = clz_info.get('constructors')
+                if len(constructors) > 0:
+                    constructors_str = []
+                    for constructor in constructors:
+                        index = 1
+                        arg_type_str = ''
+                        for arg_type in constructor:
+                            if index == 1:
+                                arg_type_str = arg_type
+                            else:
+                                arg_type_str = '{}, {}'.format(arg_type_str, arg_type)
+                            index = index + 1
+                        constructors_str.append(arg_type_str)
+                    new_info['constructors'] = constructors_str
+                    new_info['override_constructor'] = 1
+                else:
+                    new_info['override_constructor'] = 0
                 funcs = clz_info.get('funcs')
                 funcs_data = []
                 for func in funcs:
@@ -97,6 +116,7 @@ class Generator_Pybind11(Generator):
 set(GENERATE_FILES
 {}
 )                    '''.format(cmake_files))
+        return export_symbol
 
 
 def GeneratorFactory(root_path, module_name, e: GeneratorType = GeneratorType.PYBIND11):        

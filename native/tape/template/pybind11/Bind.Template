@@ -1,3 +1,4 @@
+#pragma once
 ${header_include(code['include_files'])}
 void ${code['export_file_name']}(pybind11::module_& m)
 {
@@ -15,6 +16,11 @@ void ${code['export_file_name']}(pybind11::module_& m)
 % else:
     auto& clz = pybind11::class_<${clz_info['name']}>(m, "${clz_info['name']}");
     clz.def(pybind11::init());
+% if clz_info['override_constructor'] == 1:
+% for constructor in clz_info['constructors']:
+    clz.def(pybind11::init<${constructor}>());
+% endfor
+% endif
 % endif
 % for func in clz_info['funcs']:
     clz.def("${func['name']}", &${clz_info['name']}::${func['name']}, "${func['comment']}");

@@ -383,8 +383,3 @@ void LAppDelegate::set_background_transparent(int handle)
     bb.fEnable = TRUE;
     DwmEnableBlurBehindWindow(HWND(handle), &bb);
 }
-
-void LAppDelegate::model_init(pybind11::object obj)
-{
-    Initialize(std::move(LAppWindow(obj)));
-}
