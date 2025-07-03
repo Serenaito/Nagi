@@ -23,7 +23,6 @@ if __name__ == '__main__':
     parser.add_argument('--test', help='if set 1 clean project and build')
     parser.add_argument('--tape', help='just tape')
     args = parser.parse_args()
-
     parser = tape.parser.Parser()
     generator = tape.generator.GeneratorFactory("generate", "nagi_cpp_ex")
     parser.add_include_directories('./include')
@@ -31,6 +30,7 @@ if __name__ == '__main__':
     parser.add_include_directories(pybind11.get_include())
     parser.add_bind_directory("include")
     export_symbol = generator.start(parser)
+    exit()
     export_symbol_str = ''
     for symbol in export_symbol:
         export_symbol_str = '{}\n{} = {}.{}'.format(export_symbol_str, symbol, module_cpp_name, symbol)

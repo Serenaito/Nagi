@@ -14,7 +14,7 @@ void ${code['export_file_name']}(pybind11::module_& m)
     "${clz_info['comment']}");
     clz.def(pybind11::init([]() { return nullptr;}));
 % else:
-    auto& clz = pybind11::class_<${clz_info['name']}>(m, "${clz_info['name']}");
+    auto& clz = pybind11::class_<${clz_info['name']}>(m, "${clz_info['name']}", "${clz_info['comment']}");
     clz.def(pybind11::init());
 % if clz_info['override_constructor'] == 1:
 % for constructor in clz_info['constructors']:

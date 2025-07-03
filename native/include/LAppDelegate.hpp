@@ -29,7 +29,7 @@ public:
     *
     * @return  クラスのインスタンス
     */
-    TFUNCTION()
+    TFUNCTION(singleton_method = 1)
     static LAppDelegate* GetInstance();
 
     /**

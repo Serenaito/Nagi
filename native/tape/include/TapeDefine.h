@@ -5,4 +5,11 @@
 #define TPROPERTY(...)
 #define TFUNCTION(...)
 
+// tape parse arg
+enum TapeTag{
+    commonent,
+    is_singleton,
+    singleton_method,
+};
+
 #endif

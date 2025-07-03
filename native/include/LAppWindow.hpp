@@ -2,7 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <TapeDefine.h>
 
-TCLASS()
+TCLASS(commonent = "nmd high")
 class LAppWindow 
 {
 public:
