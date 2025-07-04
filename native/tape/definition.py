@@ -1,7 +1,6 @@
 from enum import Enum
 
 Debug = True
-
 class TapeType(Enum):
     TCLASS = 1,
     TFUNCTION = 2,

@@ -10,6 +10,7 @@ enum TapeTag{
     commonent,
     is_singleton,
     singleton_method,
+    library,
 };
 
 #endif

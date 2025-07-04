@@ -25,6 +25,73 @@ class Generator_Pybind11(Generator):
     def __init__(self, root_path, module_name):
         super().__init__(root_path, module_name)
 
+    @staticmethod
+    def __handle_singleton_class(out_data:dict, clz_name, clz_info:dict, meta_info:dict):
+        if"singleton_method" not in meta_info:
+            return False
+        out_data['override_constructor'] = 0
+        out_data['is_wrapper'] = 1
+        out_data['singleton_method'] = meta_info['singleton_method']
+        funcs_data = []
+        funcs = clz_info.get('funcs')
+        access_symbol = '.'
+        if meta_info['singleton_pointer']:
+            access_symbol = '->'
+        for func in funcs:
+            is_static = func['is_static']
+            if is_static != 1 :
+                params_str = ""
+                params_def_str = ""
+                arg_type_list = func['arg_type_list']
+
+                for i in range(0, len(arg_type_list)):
+                    if i == 0:
+                        params_str = "arg{}".format(i)
+                        params_def_str = "{} arg{}".format(arg_type_list[i], i)
+                    else:
+                        params_str = "{}, arg{}".format(params_str, i)
+                        params_def_str = "{}, {} arg{}".format(params_def_str, arg_type_list[i], i)
+                name = func['name']
+                funcs_data.append(dict(name = name, real_name="Call_{}_{}".format(clz_name, name),
+                                   is_static = is_static,
+                                   return_type = func['return_type'],
+                                   arg_list_str = params_str,
+                                   arg_list_def_str = params_def_str,
+                                   access_symbol = access_symbol,
+                                   comment = func.get("comment", "")))
+            else:
+                funcs_data.append(dict(name = func['name'], is_static = is_static,
+                                   comment = func.get("comment", "")))
+        out_data['funcs'] = funcs_data
+        return True
+
+    @staticmethod        
+    def __handle_class(out_data:dict, clz_info:dict):
+        out_data['is_wrapper'] = 0
+        constructors = clz_info.get('constructors')
+        if len(constructors) > 0:
+            constructors_str = []
+            for constructor in constructors:
+                index = 1
+                arg_type_str = ''
+                for arg_type in constructor:
+                    if index == 1:
+                        arg_type_str = arg_type
+                    else:
+                        arg_type_str = '{}, {}'.format(arg_type_str, arg_type)
+                    index = index + 1
+                constructors_str.append(arg_type_str)
+            out_data['constructors'] = constructors_str
+            out_data['override_constructor'] = 1
+        else:
+            out_data['override_constructor'] = 0
+        funcs = clz_info.get('funcs')
+        funcs_data = []
+        for func in funcs:
+            funcs_data.append(dict(name = func['name'], 
+                                   is_static = func['is_static'],
+                                   comment = func.get("comment", "")))
+        out_data['funcs'] = funcs_data
     def start(self, parser):
         abs_path = os.path.abspath(self._root_path)
         if os.path.exists(abs_path):
@@ -63,32 +130,9 @@ class Generator_Pybind11(Generator):
                 meta_info = clz_info.get('meta_info')
                 new_info['comment'] = meta_info.get('comment', '')
                 new_info['is_singleton'] = meta_info.get('is_singleton', 0)
-                constructors = clz_info.get('constructors')
-                if len(constructors) > 0:
-                    constructors_str = []
-                    for constructor in constructors:
-                        index = 1
-                        arg_type_str = ''
-                        for arg_type in constructor:
-                            if index == 1:
-                                arg_type_str = arg_type
-                            else:
-                                arg_type_str = '{}, {}'.format(arg_type_str, arg_type)
-                            index = index + 1
-                        constructors_str.append(arg_type_str)
-                    new_info['constructors'] = constructors_str
-                    new_info['override_constructor'] = 1
-                else:
-                    new_info['override_constructor'] = 0
-                funcs = clz_info.get('funcs')
-                funcs_data = []
-                for func in funcs:
-                    meta_info = func.get('meta_info')
-                    funcs_data.append(dict(name = func['name'], 
-                                           comment = meta_info.get("comment", "")))
-                new_info['funcs'] = funcs_data
+                if not Generator_Pybind11.__handle_singleton_class(new_info, clz_name, clz_info, meta_info):
+                    Generator_Pybind11.__handle_class(new_info, clz_info)
             codes.append(code)
-            # t = lookup.get_template("Bind.Template")
         
         for dir in create_directories:
             dir = os.path.join(abs_path, dir)
@@ -100,6 +144,7 @@ class Generator_Pybind11(Generator):
             imported_funcs.append(code['export_file_name'])
             with open( code['file_path'], 'w') as f:
                 t = lookup.get_template("Bind.Template")
+                # print(code)
                 code = t.render(code = code)
                 f.write(code.replace('\r',''))
         file_path = os.path.join(abs_path, 'Bind_Main.cpp')

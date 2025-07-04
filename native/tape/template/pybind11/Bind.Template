@@ -1,12 +1,37 @@
 #pragma once
 ${header_include(code['include_files'])}
+
+% for clz_info in code['clz_infos']:
+% if clz_info['is_wrapper'] == 1:
+% for func_info in clz_info['funcs']:
+% if func_info['is_static'] != 1:
+    ${add_function_proxy(clz_info['name'], clz_info['singleton_method'], func_info)}
+% endif
+% endfor
+% endif
+% endfor
+
 void ${code['export_file_name']}(pybind11::module_& m)
 {
 % for clz_info in code['clz_infos']:
+% if clz_info['is_wrapper'] == 1:
+    ${add_wraper_cls(clz_info)}
+% else:
     ${add_cls(clz_info)}
+% endif
 % endfor
 }
 <%namespace file="base.template" import="*"/>
+<%def name="add_function_proxy(clz_name, method, func_info)">
+${func_info["return_type"]} ${func_info["real_name"]}(${func_info["arg_list_def_str"]})
+{
+% if func_info['return_type'] == "void":
+    ${clz_name}::${method}()${func_info['access_symbol']}${func_info['name']}(${func_info['arg_list_str']});
+% else:
+    return ${clz_name}::${method}()${func_info['access_symbol']}${func_info['name']}(${func_info['arg_list_str']});
+% endif
+}
+</%def>
 <%def name="add_cls(clz_info)">
 % if clz_info['is_singleton'] == 1:
     auto& clz = pybind11::class_<${clz_info['name']}, std::unique_ptr<${clz_info['name']}, pybind11::nodelete>>(m, 
@@ -23,6 +48,23 @@ void ${code['export_file_name']}(pybind11::module_& m)
 % endif
 % endif
 % for func in clz_info['funcs']:
+% if func['is_static'] == 1:
+    clz.def_static("${func['name']}", &${clz_info['name']}::${func['name']}, "${func['comment']}");
+% else:
     clz.def("${func['name']}", &${clz_info['name']}::${func['name']}, "${func['comment']}");
+% endif
+% endfor
+</%def>
+<%def name="add_wraper_cls(clz_info)">
+    auto& clz = pybind11::class_<${clz_info['name']}, std::unique_ptr<${clz_info['name']}, pybind11::nodelete>>(m, 
+    "${clz_info['name']}",
+    "${clz_info['comment']}");
+    clz.def(pybind11::init([]() { return nullptr;}));
+% for func in clz_info['funcs']:
+% if func['is_static'] == 1:
+    clz.def_static("${func['name']}", &${clz_info['name']}::${func['name']}, "${func['comment']}");
+% else:
+    clz.def_static("${func['name']}", &${func['real_name']}, "${func['comment']}");
+% endif
 % endfor
 </%def>

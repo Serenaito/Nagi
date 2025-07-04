@@ -31,6 +31,7 @@ class CursorProxy:
         self._cursor = cursor
         self._handler = handler
         self.childrens = list()
+        self.childrens_map = dict()
     @property
     def key(self):
         return self._key
@@ -51,6 +52,8 @@ class CursorProxy:
     
     def add_child(self, children):
         self.childrens.append(children)
+    def add_child_map(self, name, chilren):
+        self.childrens_map[name] = chilren
 
 class Handler:
     def __init__(self, parent:Context, key_word):
@@ -93,7 +96,10 @@ def collection_metadata(context:Context, root:cindex.Cursor):
             cursor_list.append(proxy)
             for child_cursor in cursor.get_children():
                 if child_cursor.kind == cindex.CursorKind.CXX_METHOD:
-                    cursor_list.append(CursorProxy(child_cursor, child_cursor.location))
+                    if child_cursor.access_specifier == cindex.AccessSpecifier.PUBLIC:
+                        method_proxy = CursorProxy(child_cursor, child_cursor.location)
+                        cursor_list.append(method_proxy)
+                        proxy.add_child_map(child_cursor.spelling, method_proxy)
                 elif child_cursor.kind == cindex.CursorKind.CONSTRUCTOR:
                     if child_cursor.access_specifier == cindex.AccessSpecifier.PUBLIC:
                         proxy.add_child(CursorProxy(child_cursor, child_cursor.location))
@@ -126,7 +132,9 @@ def ananlysis_file(file_path, compile_args):
 class ClassHandler(Handler):
     key_words = [
         "commont",
-    "is_singleton",
+        "is_singleton",
+        "singleton_method",
+        "library"
     ]
     def __init__(self, parent, key_word):
         super().__init__(parent, key_word)
@@ -138,17 +146,26 @@ class ClassHandler(Handler):
                 real_meta_info = self.meta_info_filter(ClassHandler.key_words, proxy.cursor)
                 clz_info = dict(meta_info = real_meta_info, funcs = [], constructors = [])
                 self._parent.database[current_proxy.cursor.spelling] = clz_info
-                for children in current_proxy.childrens:
-                    arg_type_list = []
-                    for arg in children.cursor.get_arguments():
-                        arg_type_list.append(arg.type.spelling)
-                    if len(arg_type_list) > 0:
-                        clz_info['constructors'].append(arg_type_list)
+                singleton_method = real_meta_info["singleton_method"]
+                if singleton_method != "":
+                    clz_info['meta_info']['is_singleton'] = 1
+                    singleton_method_cusor_proxy:cindex.Cursor = current_proxy.childrens_map.get(singleton_method)
+                    if singleton_method_cusor_proxy is None or not singleton_method_cusor_proxy.cursor.is_static_method():
+                        clz_info['meta_info'].pop('singleton_method')
+                    else:
+                        clz_info['meta_info']["singleton_pointer"] =  singleton_method_cusor_proxy.cursor.type.get_result().kind == cindex.TypeKind.POINTER
+                else:
+                    real_meta_info.pop('singleton_method')
+                    for children in current_proxy.childrens:
+                        arg_type_list = []
+                        for arg in children.cursor.get_arguments():
+                            arg_type_list.append(arg.type.spelling)
+                        if len(arg_type_list) > 0:
+                            clz_info['constructors'].append(arg_type_list)
                 return
 class FunctionHandler(Handler):
     key_words = [
         "commont",
-        "singleton_method",
     ]
     def __init__(self, parent, key_word):
         super().__init__(parent, key_word)
@@ -166,18 +183,22 @@ class FunctionHandler(Handler):
             if self._parent.database.get(clz) is None:
                 continue
 
-            real_meta_info = self.meta_info_filter(FunctionHandler.key_words, proxy.cursor)
-            
-            singleton_method = real_meta_info.get('singleton_method', 0)
+            arg_type_list = []
+            return_type = ""
             name = current_proxy.cursor.spelling
-            if singleton_method == 1:
-                is_ponter = current_proxy.cursor.type.get_result().kind == cindex.TypeKind.POINTER and 1 or 0
-                self._parent.database[clz]['singleton_method'] = dict(
-                    name = name,
-                    is_pointer = is_ponter
-                )
-            else:
-                is_static = current_proxy.cursor.storage_class == cindex.StorageClass.STATIC
-                self._parent.database[clz]['funcs'].append(dict(name = name,
-                                                            meta_info = real_meta_info, is_static = is_static))
+            clz_meta_info = self._parent.database[clz]['meta_info']
+            if 'singleton_method' in clz_meta_info:
+                if clz_meta_info['singleton_method'] == name: 
+                    continue
+                for arg in current_proxy.cursor.get_arguments():
+                    arg_type_list.append(arg.type.spelling)
+                return_type = current_proxy.cursor.type.get_result().spelling
+            
+            is_static = current_proxy.cursor.is_static_method()
+            real_meta_info = self.meta_info_filter(FunctionHandler.key_words, proxy.cursor)
+            real_meta_info['arg_type_list'] = arg_type_list
+            real_meta_info['return_type'] = return_type
+            real_meta_info['is_static'] = is_static
+            real_meta_info['name'] = current_proxy.cursor.spelling
+            self._parent.database[clz]['funcs'].append(real_meta_info)
             return

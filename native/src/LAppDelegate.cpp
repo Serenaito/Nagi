@@ -12,8 +12,6 @@
 #include "LAppDefine.hpp"
 #include "LAppLive2DManager.hpp"
 #include "LAppTextureManager.hpp"
-#include <Windows.h>
-#include <dwmapi.h>
 
 using namespace Csm;
 using namespace std;
@@ -372,14 +370,4 @@ bool LAppDelegate::CheckShader(GLuint shaderId)
     }
 
     return true;
-}
-
-void LAppDelegate::set_background_transparent(int handle)
-{
-    DWM_BLURBEHIND bb = { 0 };
-    HRGN hRgn = CreateRectRgn(0, 0, -1, -1);
-    bb.dwFlags = DWM_BB_ENABLE | DWM_BB_BLURREGION;
-    bb.hRgnBlur = hRgn;
-    bb.fEnable = TRUE;
-    DwmEnableBlurBehindWindow(HWND(handle), &bb);
 }

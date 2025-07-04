@@ -19,7 +19,7 @@ class LAppTextureManager;
 *   Cubism SDK の管理を行う。
 */
 
-TCLASS(is_singleton = 1)
+TCLASS(singleton_method = "GetInstance")
 class LAppDelegate
 {
 public:
@@ -29,7 +29,6 @@ public:
     *
     * @return  クラスのインスタンス
     */
-    TFUNCTION(singleton_method = 1)
     static LAppDelegate* GetInstance();
 
     /**
@@ -112,10 +111,6 @@ public:
     void AppEnd() { _isEnd = true; }
 
     LAppTextureManager* GetTextureManager() { return _textureManager; }
-
-    TFUNCTION()
-    static void set_background_transparent(int handle);
-    
 private:
     /**
     * @brief   コンストラクタ
