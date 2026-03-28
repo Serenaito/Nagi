@@ -104,6 +104,7 @@ class Generator_Pybind11(Generator):
         codes = []
         cmake_files = ''
         export_symbol = []
+        print(parser.metadatas)
         for metadata in parser.metadatas:
             path:Path = metadata['path']
             create_directories.add(path.local_root)

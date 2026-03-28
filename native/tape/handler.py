@@ -188,12 +188,13 @@ class FunctionHandler(Handler):
             name = current_proxy.cursor.spelling
             clz_meta_info = self._parent.database[clz]['meta_info']
             if 'singleton_method' in clz_meta_info:
-                if clz_meta_info['singleton_method'] == name: 
+                if clz_meta_info['singleton_method'] == name:
                     continue
-                for arg in current_proxy.cursor.get_arguments():
-                    arg_type_list.append(arg.type.spelling)
-                return_type = current_proxy.cursor.type.get_result().spelling
-            
+            # 解析函数参数和返回值（支持单例和非单例类）
+            for arg in current_proxy.cursor.get_arguments():
+                arg_type_list.append(arg.type.spelling)
+            return_type = current_proxy.cursor.type.get_result().spelling
+
             is_static = current_proxy.cursor.is_static_method()
             real_meta_info = self.meta_info_filter(FunctionHandler.key_words, proxy.cursor)
             real_meta_info['arg_type_list'] = arg_type_list

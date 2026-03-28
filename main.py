@@ -15,5 +15,6 @@ if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     w = MainWindow()
     w.show()
+    w.widget.showBubbleText("你好")
     PlatformLibrary.set_background_transparent(w.winId())
     sys.exit(app.exec())
