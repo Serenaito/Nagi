@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "TapeDefine.h"
 #include <CubismFramework.hpp>
 #include <Math/CubismMatrix44.hpp>
 #include <Type/csmVector.hpp>
@@ -18,6 +19,7 @@ class LAppModel;
 *         モデル生成と破棄、タップイベントの処理、モデル切り替えを行う。
 *
 */
+TCLASS(singleton_method = "GetInstance")
 class LAppLive2DManager
 {
 
@@ -82,6 +84,7 @@ public:
     * @brief   シーンを切り替える<br>
     *           サンプルアプリケーションではモデルセットの切り替えを行う。
     */
+    TFUNCTION()
     bool ChangeScene(Csm::csmChar* name);
 
     /**
@@ -108,5 +111,4 @@ private:
 
     Csm::CubismMatrix44*        _viewMatrix; ///< モデル描画に用いるView行列
     Csm::csmVector<LAppModel*>  _models; ///< モデルインスタンスのコンテナ
-    //Csm::csmInt32               _sceneIndex; ///< 表示するシーンのインデックス値
 };

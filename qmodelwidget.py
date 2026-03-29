@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QColor, QFont
 from nagi_native import LAppDelegate,LAppWindow
 import math
+from G import G
 
 class BubbleText:
     """气泡文字类，存储气泡的显示信息"""
@@ -22,17 +23,17 @@ class BubbleText:
 class QModelWidget(QtOpenGLWidgets.QOpenGLWidget):
     def __init__(self, parent=None):
         super(QModelWidget, self).__init__(parent = parent)
-        LAppDelegate.Initialize(LAppWindow(self))
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update)
         self.timer.start(33)
         self.bubbles = []  # 存储当前显示的气泡文字
 
     def initializeGL(self):
-        LAppDelegate.Initialize(LAppWindow(self))
+        LAppDelegate.Initialize(LAppWindow(self), G.config.get_current_mode())
 
     def resizeGL(self, w, h):
-        LAppDelegate.resize(w, h)
+        pass
+        # LAppDelegate.resize(w, h)
     
     def mouseReleaseEvent(self, event):
         LAppDelegate.mouseReleaseEvent(event.x(), event.y())

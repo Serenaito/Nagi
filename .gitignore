@@ -6,3 +6,4 @@ __pycache__
 Resources
 __template_cache__
 native/generate
+config.json

@@ -102,7 +102,6 @@ bool LAppModel::LoadAssets(const csmChar* dir, const csmChar* fileName)
     SetupModel(setting);
 
     CreateRenderer();
-
     SetupTextures();
     return true;
 }

@@ -40,6 +40,9 @@ void CubismOffscreenFrame_OpenGLES2::BeginDraw(GLint restoreFBO)
 
     // マスク用RenderTextureをactiveにセット
     glBindFramebuffer(GL_FRAMEBUFFER, _renderTexture);
+    GLenum error = glGetError();
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 }
 
 void CubismOffscreenFrame_OpenGLES2::EndDraw()
@@ -100,6 +103,10 @@ csmBool CubismOffscreenFrame_OpenGLES2::CreateOffscreenFrame(csmUint32 displayBu
         glBindFramebuffer(GL_FRAMEBUFFER, tmpFramebufferObject);
 
         _renderTexture = ret;
+
+        glBindFramebuffer(GL_FRAMEBUFFER, _renderTexture);
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        glBindFramebuffer(GL_FRAMEBUFFER, tmpFramebufferObject);
 
         _bufferWidth = displayBufferWidth;
         _bufferHeight = displayBufferHeight;

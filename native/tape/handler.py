@@ -194,7 +194,6 @@ class FunctionHandler(Handler):
             for arg in current_proxy.cursor.get_arguments():
                 arg_type_list.append(arg.type.spelling)
             return_type = current_proxy.cursor.type.get_result().spelling
-
             is_static = current_proxy.cursor.is_static_method()
             real_meta_info = self.meta_info_filter(FunctionHandler.key_words, proxy.cursor)
             real_meta_info['arg_type_list'] = arg_type_list

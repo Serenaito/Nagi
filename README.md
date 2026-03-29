@@ -1,15 +1,14 @@
 # Nagi
 
 #### 介绍
-windows智能桌面看板娘
+windows 桌面看板娘python版本
 
 #### 软件架构
 pyside + live2d
 https://github.com/Serenaito/qf 衍生软件
 
 #### 安装教程
-to do
-
+pybind11
 
 #### 模型来源说明
 1. Hiyori模型来源于live2d官方网站(https://www.live2d.com/)

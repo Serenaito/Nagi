@@ -94,8 +94,10 @@ extern "C"
         csmMocVersion_33 = 2,
         /** moc3 file version 4.0.00 - 4.1.05 */
         csmMocVersion_40 = 3,
-        /** moc3 file version 4.2.00 - */
-        csmMocVersion_42 = 4
+        /** moc3 file version 4.2.00 - 4.2.04 */
+        csmMocVersion_42 = 4,
+        /** moc3 file version 5.0.00 - */
+        csmMocVersion_50 = 5
     };
 
     /** moc3 version identifier. */
@@ -179,6 +181,20 @@ extern "C"
      * @return csmMocVersion
      */
     csmApi csmMocVersion csmCallingConvention csmGetMocVersion(const void* address, const unsigned int size);
+
+    /* ----------- *
+     * CONSISTENCY *
+     * ----------- */
+
+    /**
+     * Checks consistency of a moc.
+     *
+     * @param  address  Address of unrevived moc. The address must be aligned to 'csmAlignofMoc'.
+     * @param  size     Size of moc (in bytes).
+     *
+     * @return  '1' if Moc is valid; '0' otherwise.
+     */
+    csmApi int csmCallingConvention csmHasMocConsistency(void* address, const unsigned int size);
 
     /* ------- *
      * LOGGING *
@@ -331,6 +347,15 @@ extern "C"
      * @return  Valid pointer on success; '0' otherwise.
      */
     csmApi float* csmCallingConvention csmGetParameterValues(csmModel* model);
+
+    /**
+     * Gets Parameter Repeat informations.
+     *
+     * @param  model  Model to query.
+     *
+     * @return  Valid pointer on success; '0' otherwise.
+     */
+    csmApi const int* csmCallingConvention csmGetParameterRepeats(const csmModel* model);
 
     /**
      * Gets number of key values of each parameter.

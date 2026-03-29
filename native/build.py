@@ -27,9 +27,13 @@ if __name__ == '__main__':
     generator = tape.generator.GeneratorFactory("generate", "nagi_cpp_ex")
     parser.add_include_directories('./include')
     parser.add_include_directories('./tape/include')
+    parser.add_include_directories('./framework/src')
     parser.add_include_directories(pybind11.get_include())
     parser.add_bind_directory("include")
     export_symbol = generator.start(parser)
+
+    if args.tape:
+        exit(0)
     export_symbol_str = ''
     for symbol in export_symbol:
         export_symbol_str = '{}\n{} = {}.{}'.format(export_symbol_str, symbol, module_cpp_name, symbol)
@@ -51,7 +55,8 @@ if __name__ == '__main__':
     cmd = 'cmake -B build'
     cmd = cmd + ' -D pybind11_DIR:PATH={}'.format(pybind11.get_cmake_dir())
     cmd = cmd + ' -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE={}'.format(python_bind_lib_path)
-    cmd = cmd + ' && cmake --build build --config Release -j4'
+    cmd = cmd + ' -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG={}'.format(python_bind_lib_path)
+    cmd = cmd + ' && cmake --build build --config Debug -j4'
     print("-------------------")
     print(cmd)
     print("-------------------")

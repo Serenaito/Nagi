@@ -41,7 +41,7 @@ void LAppDelegate::ReleaseInstance()
     s_instance = NULL;
 }
 
-bool LAppDelegate::Initialize(LAppWindow& window)
+bool LAppDelegate::Initialize(LAppWindow& window, char* name)
 {
     if (DebugLogEnable)
     {
@@ -57,6 +57,7 @@ bool LAppDelegate::Initialize(LAppWindow& window)
         return GL_FALSE;
     }
 
+    default_model = name;
     //テクスチャサンプリング設定
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -72,11 +73,8 @@ bool LAppDelegate::Initialize(LAppWindow& window)
     //AppViewの初期化
     _view->Initialize();
 
-    // Cubism SDK の初期化
     InitializeCubism();
     glViewport(0, 0, _windowWidth, _windowHeight);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     return GL_TRUE;
 }
 
@@ -93,12 +91,6 @@ void LAppDelegate::Release()
     //Cubism SDK の解放
     CubismFramework::Dispose();
 }
-
-
-//void LAppDelegate::resize()
-//{
-//    resize(_window.width(), _window.height());
-//}
 
 void LAppDelegate::resize(int width,int height)
 {
@@ -131,51 +123,6 @@ void LAppDelegate::update()
     _view->Render();
 }
 
-#if 0
-void LAppDelegate::Run()
-{
-    //メインループ
-    while (glfwWindowShouldClose(_window) == GL_FALSE && !_isEnd)
-    {
-        int width, height;
-        glfwGetWindowSize(LAppDelegate::GetInstance()->GetWindow(), &width, &height);
-        if( (_windowWidth!=width || _windowHeight!=height) && width>0 && height>0)
-        {
-            //AppViewの初期化
-            _view->Initialize();
-            // スプライトサイズを再設定
-            _view->ResizeSprite();
-            // サイズを保存しておく
-            _windowWidth = width;
-            _windowHeight = height;
-
-            // ビューポート変更
-            glViewport(0, 0, width, height);
-        }
-
-        // 時間更新
-        LAppPal::UpdateTime();
-
-        // 画面の初期化
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearDepth(1.0);
-
-        //描画更新
-        _view->Render();
-
-        // バッファの入れ替え
-        glfwSwapBuffers(_window);
-
-        // Poll for and process events
-    }
-
-    Release();
-
-    LAppDelegate::ReleaseInstance();
-}
-#endif
-
 LAppDelegate::LAppDelegate():
     _cubismOption(),
     _window(),
@@ -206,7 +153,7 @@ void LAppDelegate::InitializeCubism()
     CubismFramework::Initialize();
 
     //load model
-    LAppLive2DManager::GetInstance();
+    LAppLive2DManager::GetInstance()->ChangeScene((Csm::csmChar*)default_model.c_str());
 
     //default proj
     CubismMatrix44 projection;
@@ -216,50 +163,6 @@ void LAppDelegate::InitializeCubism()
     _view->InitializeSprite();
 }
 
-#if 0
-void LAppDelegate::OnMouseCallBack(int button, int action, int modify)
-{
-    if (_view == NULL)
-    {
-        return;
-    }
-    if (GLFW_MOUSE_BUTTON_LEFT != button)
-    {
-        return;
-    }
-
-    if (GLFW_PRESS == action)
-    {
-        _captured = true;
-        _view->OnTouchesBegan(_mouseX, _mouseY);
-    }
-    else if (GLFW_RELEASE == action)
-    {
-        if (_captured)
-        {
-            _captured = false;
-            _view->OnTouchesEnded(_mouseX, _mouseY);
-        }
-    }
-}
-
-void LAppDelegate::OnMouseCallBack(double x, double y)
-{
-    _mouseX = static_cast<float>(x);
-    _mouseY = static_cast<float>(y);
-
-    if (!_captured)
-    {
-        return;
-    }
-    if (_view == NULL)
-    {
-        return;
-    }
-
-    _view->OnTouchesMoved(_mouseX, _mouseY);
-}
-#endif
 void LAppDelegate::mousePressEvent(int x, int y)
 {
     if (_view == NULL)
@@ -269,6 +172,7 @@ void LAppDelegate::mousePressEvent(int x, int y)
     _captured = true;
     _view->OnTouchesBegan((float)x, (float)y);
 }
+
 void LAppDelegate::mouseReleaseEvent(int x, int y)
 {
     if (_view == NULL)

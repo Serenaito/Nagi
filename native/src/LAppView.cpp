@@ -104,9 +104,6 @@ void LAppView::Initialize()
 
 void LAppView::Render()
 {
-    //_back->Render();
-    //_gear->Render();
-    //_power->Render();
 
     LAppLive2DManager* Live2DManager = LAppLive2DManager::GetInstance();
 
@@ -150,36 +147,6 @@ void LAppView::InitializeSprite()
     int height = LAppDelegate::GetInstance()->GetWindow()->height();
     float x = width * 0.5f;
     float y = height * 0.5f;
-#if 0
-    LAppTextureManager* textureManager = LAppDelegate::GetInstance()->GetTextureManager();
-    const string resourcesPath = ResourcesPath;
-    string imageName = BackImageName;
-    LAppTextureManager::TextureInfo* backgroundTexture = textureManager->CreateTextureFromPngFile(resourcesPath + imageName);
-
-    float x = width * 0.5f;
-    float y = height * 0.5f;
-    float fWidth = static_cast<float>(backgroundTexture->width * 2.0f);
-    float fHeight = static_cast<float>(height * 0.95f);
-    _back = new LAppSprite(x, y, fWidth, fHeight, backgroundTexture->id, _programId);
-
-    imageName = GearImageName;
-    LAppTextureManager::TextureInfo* gearTexture = textureManager->CreateTextureFromPngFile(resourcesPath + imageName);
-
-    x = static_cast<float>(width - gearTexture->width * 0.5f);
-    y = static_cast<float>(height - gearTexture->height * 0.5f);
-    fWidth = static_cast<float>(gearTexture->width);
-    fHeight = static_cast<float>(gearTexture->height);
-    _gear = new LAppSprite(x, y, fWidth, fHeight, gearTexture->id, _programId);
-
-    imageName = PowerImageName;
-    LAppTextureManager::TextureInfo* powerTexture = textureManager->CreateTextureFromPngFile(resourcesPath + imageName);
-
-    x = static_cast<float>(width - powerTexture->width * 0.5f);
-    y = static_cast<float>(powerTexture->height * 0.5f);
-    fWidth = static_cast<float>(powerTexture->width);
-    fHeight = static_cast<float>(powerTexture->height);
-    _power = new LAppSprite(x, y, fWidth, fHeight, powerTexture->id, _programId);
-#endif
 
     // 画面全体を覆うサイズ
     //x = width * 0.5f;

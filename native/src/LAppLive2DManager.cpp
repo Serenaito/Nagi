@@ -50,15 +50,8 @@ void LAppLive2DManager::ReleaseInstance()
 
 LAppLive2DManager::LAppLive2DManager()
     : _viewMatrix(NULL)
-    //, _sceneIndex(0)
 {
     _viewMatrix = new CubismMatrix44();
-
-    //ChangeScene(_sceneIndex);
-    if (!ChangeScene((Csm::csmChar*)"Hiyori"))
-    {
-        pybind11::print("fail");
-    }
 }
 
 LAppLive2DManager::~LAppLive2DManager()
@@ -165,12 +158,6 @@ void LAppLive2DManager::OnUpdate() const
     }
 }
 
-//void LAppLive2DManager::NextScene()
-//{
-//    csmInt32 no = (_sceneIndex + 1) % ModelDirSize;
-//   ChangeScene(no);
-//}
-
 bool LAppLive2DManager::ChangeScene(Csm::csmChar* name)
 {
     //_sceneIndex = index;
@@ -178,33 +165,19 @@ bool LAppLive2DManager::ChangeScene(Csm::csmChar* name)
     {
         LAppPal::PrintLog("[APP]model index: %s", name);
     }
-    //LAppPal::PrintLog("[APP]model index: %s", name);
-    // ModelDir[]に保持したディレクトリ名から
-    // model3.jsonのパスを決定する.
-    // ディレクトリ名とmodel3.jsonの名前を一致させておくこと.
-    //std::string model = ModelDir[index];
-    //std::string modelPath = ResourcesPath + model + "/";
-    //std::string modelJsonName = ModelDir[index];
     char modelPath[128];
     char modelJsonName[128];
-    snprintf(modelPath,128,"%s%s/",ResourcesPath,(char*)name);
+    snprintf(modelPath,128,"%s%s/", ResourcesPath, (char*)name);
     snprintf(modelJsonName,128,"%s.model3.json", (char*)name);
 
-    //std::string modelJsonName = ModelDir[index];
-    //modelJsonName += ".model3.json";
     ReleaseAllModel();
     _models.PushBack(new LAppModel());
-    //_models[0]->LoadAssets(modelPath.c_str(), modelJsonName.c_str());
-     if(_models[0]->LoadAssets(modelPath, modelJsonName)==false)
-     {
-         ReleaseAllModel();
-         return false;
-     }
-    /*
-     * モデル半透明表示を行うサンプルを提示する。
-     * ここでUSE_RENDER_TARGET、USE_MODEL_RENDER_TARGETが定義されている場合
-     * 別のレンダリングターゲットにモデルを描画し、描画結果をテクスチャとして別のスプライトに張り付ける。
-     */
+    if(_models[0]->LoadAssets(modelPath, modelJsonName)==false)
+    {
+        ReleaseAllModel();
+        return false;
+    }
+
     {
 #if defined(USE_RENDER_TARGET)
         // LAppViewの持つターゲットに描画を行う場合、こちらを選択
