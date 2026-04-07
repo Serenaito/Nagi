@@ -13,6 +13,12 @@ class Config:
             "minimize_to_tray": True,
             "background_transparent": True,
             "current_model": "",
+            "window_movable": True,  # 是否允许移动窗口
+            "window_x": None,  # 窗口 X 坐标，None 表示使用默认位置
+            "window_y": None,  # 窗口 Y 坐标，None 表示使用默认位置
+            "network_enabled": True,  # 是否启用网络服务
+            "network_host": "127.0.0.1",  # 网络服务监听地址
+            "network_port": 9527,  # 网络服务监听端口
         }
         self.load()
 

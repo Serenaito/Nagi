@@ -1859,7 +1859,7 @@ void CubismRenderer_OpenGLES2::DoDrawModel()
         PreDraw();
 
         // サイズが違う場合はここで作成しなおし
-        if (_offscreenFrameBuffer.GetBufferWidth() != static_cast<csmUint32>(_clippingManager->GetClippingMaskBufferSize().X) ||
+        if (!_offscreenFrameBuffer.IsValid() ||_offscreenFrameBuffer.GetBufferWidth() != static_cast<csmUint32>(_clippingManager->GetClippingMaskBufferSize().X) ||
             _offscreenFrameBuffer.GetBufferHeight() != static_cast<csmUint32>(_clippingManager->GetClippingMaskBufferSize().Y))
         {
             _offscreenFrameBuffer.DestroyOffscreenFrame();

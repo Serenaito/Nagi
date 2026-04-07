@@ -15,6 +15,8 @@ class SystemTray(QObject):
     quit_triggered = Signal()
     topmost_triggered = Signal()
     change_model_triggered = Signal(str)
+    movable_triggered = Signal(bool)  # 窗口可移动状态变化信号
+    reset_position_triggered = Signal()  # 重置窗口位置信号
 
     def __init__(self, parent=None, config=None):
         super().__init__(parent)
@@ -95,6 +97,18 @@ class SystemTray(QObject):
         self.topmost_action.triggered.connect(self._on_topmost_toggled)
         menu.addAction(self.topmost_action)
 
+        # 允许移动窗口动作
+        self.movable_action = QAction("允许移动窗口", menu)
+        self.movable_action.setCheckable(True)
+        self.movable_action.setChecked(G.config.get("window_movable", True))
+        self.movable_action.triggered.connect(self._on_movable_toggled)
+        menu.addAction(self.movable_action)
+
+        # 重置窗口位置动作
+        self.reset_position_action = QAction("重置窗口位置", menu)
+        self.reset_position_action.triggered.connect(self._on_reset_position)
+        menu.addAction(self.reset_position_action)
+
         menu.addSeparator()
 
         # 退出动作
@@ -123,6 +137,17 @@ class SystemTray(QObject):
         """置顶状态切换处理"""
         G.config.set("window_topmost", checked)
         self.topmost_triggered.emit()
+
+    def _on_movable_toggled(self, checked):
+        """允许移动窗口状态切换处理"""
+        G.config.set("window_movable", checked)
+        self.movable_triggered.emit(checked)
+
+    def _on_reset_position(self):
+        """重置窗口位置处理"""
+        G.config.set("window_x", None)
+        G.config.set("window_y", None)
+        self.reset_position_triggered.emit()
 
     def show(self):
         """显示托盘图标"""
